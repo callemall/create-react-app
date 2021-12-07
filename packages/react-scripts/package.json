@@ -1,6 +1,6 @@
 {
   "name": "tea-react-scripts",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Used by Text-Em-All, Custom Configuration and scripts for Create React App, based on version 4.0.3",
   "repository": {
     "type": "git",
@@ -87,6 +87,7 @@
     "webpack-bundle-analyzer": "3.9.0",
     "webpack-dev-server": "3.11.1",
     "webpack-manifest-plugin": "2.2.0",
+    "webpack-subresource-integrity": "1.5.2",
     "workbox-webpack-plugin": "5.1.4"
   },
   "devDependencies": {

@@ -14,6 +14,9 @@ const webpack = require('webpack');
 const resolve = require('resolve');
 const PnpWebpackPlugin = require('pnp-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+// DO NOT UPDATE VERSION NUMBER FOR THIS PACKAGE (LAST USABLE VERSION FOR WEBPACK 4)
+//                    IT WILL BREAK $H1T!
+const SriPlugin = require('webpack-subresource-integrity');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const InlineChunkHtmlPlugin = require('react-dev-utils/InlineChunkHtmlPlugin');
 const TerserPlugin = require('terser-webpack-plugin');
@@ -386,6 +389,9 @@ module.exports = function(webpackEnv) {
       // this defaults to 'window', but by setting it to 'this' then
       // module chunks which are built will work in web workers as well.
       globalObject: 'this',
+      // this adds the crossOriginLoading attribute to production injected scripts to allow
+      // code splitting  by SriPlugin for adding integrity hashing.
+      ...(isEnvProduction && { crossOriginLoading: 'anonymous' }),
     },
     optimization: {
       minimize: isEnvProduction,
@@ -747,6 +753,9 @@ module.exports = function(webpackEnv) {
       ],
     },
     plugins: [
+      // Generate and inject integrity hashes to static files.
+      // Only adding the hashes in production builds will prevent any issues with hot reloading.
+      isEnvProduction && new SriPlugin({ hashFuncNames: ['sha384'] }),
       // Generates an `index.html` file with the <script> injected.
       ...teaWebAppHtmlPlugins, // *** Text-Em-All Web App
       // Inlines the webpack runtime script. This script is too small to warrant
