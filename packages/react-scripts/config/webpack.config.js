@@ -222,13 +222,6 @@ module.exports = function(webpackEnv) {
       'index.html',
       minifyOptions
     ),
-    makeHtmlPluginEntryForPage(
-      'verify-email',
-      paths.appVerifyEmailHtml,
-      'verify-email.html',
-      minifyOptions
-    ),
-
     makeHtmlPluginEntryForBundle('bundle', 'static/js/bundle.js'),
   ];
   const teaWebAppManifestPlugins = shouldDisableManifestGeneration
