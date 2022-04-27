@@ -188,10 +188,6 @@ module.exports = function(webpackEnv) {
       // changing JS code would still trigger a refresh.
       paths.appIndexJs,
     ].filter(Boolean),
-    login: [conditionalHotDevClient, paths.appLoginIndexJs].filter(Boolean),
-    onboarding: [conditionalHotDevClient, paths.appOnboardingIndexJs].filter(
-      Boolean
-    ),
   };
   // Allow excluding entry points from build based on environment variable ENTRY_POINTS.
   // If the env variable is defined and an entry point is not included, remove it from
@@ -199,12 +195,6 @@ module.exports = function(webpackEnv) {
   if (isEnvDevelopment && envEntryPoints) {
     if (!entryPointsList.includes('bundle')) {
       delete teaWebAppEntryPoints.bundle;
-    }
-    if (!entryPointsList.includes('login')) {
-      delete teaWebAppEntryPoints.login;
-    }
-    if (!entryPointsList.includes('onboarding')) {
-      delete teaWebAppEntryPoints.onboarding;
     }
   }
 
@@ -233,18 +223,6 @@ module.exports = function(webpackEnv) {
       minifyOptions
     ),
     makeHtmlPluginEntryForPage(
-      'login',
-      paths.appLoginHtml,
-      'login.html',
-      minifyOptions
-    ),
-    makeHtmlPluginEntryForPage(
-      'onboarding',
-      paths.appOnboardingHtml,
-      'onboarding.html',
-      minifyOptions
-    ),
-    makeHtmlPluginEntryForPage(
       'verify-email',
       paths.appVerifyEmailHtml,
       'verify-email.html',
@@ -252,15 +230,11 @@ module.exports = function(webpackEnv) {
     ),
 
     makeHtmlPluginEntryForBundle('bundle', 'static/js/bundle.js'),
-    makeHtmlPluginEntryForBundle('login', 'static/js/login.js'),
-    makeHtmlPluginEntryForBundle('onboarding', 'static/js/onboarding.js'),
   ];
   const teaWebAppManifestPlugins = shouldDisableManifestGeneration
     ? []
     : [
         makeManifestPluginForBundle('bundle'),
-        makeManifestPluginForBundle('login'),
-        makeManifestPluginForBundle('onboarding'),
       ];
   // *** Text-Em-All Web App ***
 
