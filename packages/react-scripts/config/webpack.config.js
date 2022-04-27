@@ -36,9 +36,9 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 // @remove-on-eject-begin
 const getCacheIdentifier = require('react-dev-utils/getCacheIdentifier');
 // @remove-on-eject-end
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
-  .BundleAnalyzerPlugin;
-const UnusedFilesWebpackPlugin = require('unused-files-webpack-plugin').default;
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
+//   .BundleAnalyzerPlugin;
+// const UnusedFilesWebpackPlugin = require('unused-files-webpack-plugin').default;
 
 const createEnvironmentHash = require('./webpack/persistentCache/createEnvironmentHash');
 
@@ -86,9 +86,8 @@ const cssModuleRegex = /\.module\.css$/;
 const sassRegex = /\.(scss|sass)$/;
 const sassModuleRegex = /\.module\.(scss|sass)$/;
 
-// *** Text-Em-All Web App
-const shouldDisableWebStatsGeneration = process.env.DISABLE_WEBSTATS === 'true';
-const shouldEnableDeadFileOutput = process.env.ENABLE_DEADFILE_OUTPUT;
+// const shouldDisableWebStatsGeneration = process.env.DISABLE_WEBSTATS === 'true';
+// const shouldEnableDeadFileOutput = process.env.ENABLE_DEADFILE_OUTPUT;
 const entrypointTemplate = path.join(
   paths.appSrc,
   'entrypoint-script-template.js'
@@ -126,7 +125,7 @@ const makeHtmlPluginEntryForBundle = (entryPoint, filename) =>
     minify: false,
     cache: false,
   });
-// *** Call-Em-All Text-Em-All Web App
+// *** Text-Em-All Text-Em-All Web App
 
 const hasJsxRuntime = (() => {
   if (process.env.DISABLE_NEW_JSX_TRANSFORM === 'true') {
@@ -184,21 +183,21 @@ module.exports = function(webpackEnv) {
   }
 
   const minifyOptions = isEnvProduction
-    ? {
-        minify: {
-          removeComments: true,
-          collapseWhitespace: true,
-          removeRedundantAttributes: true,
-          useShortDoctype: true,
-          removeEmptyAttributes: true,
-          removeStyleLinkTypeAttributes: true,
-          keepClosingSlash: true,
-          minifyJS: true,
-          minifyCSS: true,
-          minifyURLs: true,
-        },
-      }
-    : undefined;
+  ? {
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeRedundantAttributes: true,
+        useShortDoctype: true,
+        removeEmptyAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        keepClosingSlash: true,
+        minifyJS: true,
+        minifyCSS: true,
+        minifyURLs: true,
+      },
+    }
+  : undefined;
 
   const teaWebAppHtmlPlugins = [
     makeHtmlPluginEntryForPage(
@@ -320,7 +319,7 @@ module.exports = function(webpackEnv) {
       : isEnvDevelopment && 'cheap-module-source-map',
     // These are the "entry points" to our application.
     // This means they will be the "root" imports that are included in JS bundle.
-    entry: paths.appIndexJs,
+    entry: teaWebAppEntryPoints, // *** Text-Em-All Web App
     output: {
       // The build folder.
       path: paths.appBuild,
@@ -416,7 +415,7 @@ module.exports = function(webpackEnv) {
       // https://medium.com/webpack/webpack-4-code-splitting-chunk-graph-and-the-splitchunks-optimization-be739a861366
       splitChunks: {
         chunks: 'all',
-        name: isEnvDevelopment,
+        // name: isEnvDevelopment,
       },
       // Keep the runtime chunk separated to enable long term caching
       // https://twitter.com/wSokra/status/969679223278505985
@@ -515,6 +514,9 @@ module.exports = function(webpackEnv) {
                 {
                   loader: require.resolve('@svgr/webpack'),
                   options: {
+                    // Text-Em-All: turn off babel transform for SVG files.
+                    // This will prevent slow start ups.
+                    // babel: false,
                     prettier: false,
                     svgo: false,
                     svgoConfig: {
@@ -870,41 +872,41 @@ module.exports = function(webpackEnv) {
       //   WEBPACK_BUNDLE_ANALYZER_FILE=statistics
       // When a client build is performed, the file statistics.json will be created in the
       //  client/build folder. You can launch the interactive bundle analyzer with the tool's CLI.
-      isEnvProduction &&
-        !shouldDisableWebStatsGeneration &&
-        process.env.WEBPACK_BUNDLE_ANALYZER_FILE &&
-        new BundleAnalyzerPlugin({
-          analyzerMode: 'disabled',
-          generateStatsFile: true,
-          statsFilename:
-            './' + process.env.WEBPACK_BUNDLE_ANALYZER_FILE + '.json',
-        }),
+      // isEnvProduction &&
+      //   !shouldDisableWebStatsGeneration &&
+      //   process.env.WEBPACK_BUNDLE_ANALYZER_FILE &&
+      //   new BundleAnalyzerPlugin({
+      //     analyzerMode: 'disabled',
+      //     generateStatsFile: true,
+      //     statsFilename:
+      //       './' + process.env.WEBPACK_BUNDLE_ANALYZER_FILE + '.json',
+      //   }),
       // Check for unused files
-      !isEnvProduction &&
-        shouldEnableDeadFileOutput &&
-        new UnusedFilesWebpackPlugin({
-          failOnUnused: false,
-          pattern: 'src/**/*.*',
-          globOptions: {
-            ignore: [
-              '**/__json-mocks__/**/*.*',
-              '**/__mocks__/**/*.*',
-              '**/__tests__/**/*.*',
-              '**/*.md',
-              '**/*.test.js',
-              '**/helpers/jest-matchers.js',
-              '**/helpers/test-helpers.js',
-              '**/registerServiceWorker.js',
-              '**/setup-tests.js',
-              '**/setupProxy.js',
-              '**/setupTests.js',
-              '**/state/api-response.js',
-              '**/state/progress/actions.js',
-              '**/style-guide-wrapper.js',
-              '**/test-utils.js',
-            ],
-          },
-        }),
+      // !isEnvProduction &&
+      //   shouldEnableDeadFileOutput &&
+      //   new UnusedFilesWebpackPlugin({
+      //     failOnUnused: false,
+      //     pattern: 'src/**/*.*',
+      //     globOptions: {
+      //       ignore: [
+      //         '**/__json-mocks__/**/*.*',
+      //         '**/__mocks__/**/*.*',
+      //         '**/__tests__/**/*.*',
+      //         '**/*.md',
+      //         '**/*.test.js',
+      //         '**/helpers/jest-matchers.js',
+      //         '**/helpers/test-helpers.js',
+      //         '**/registerServiceWorker.js',
+      //         '**/setup-tests.js',
+      //         '**/setupProxy.js',
+      //         '**/setupTests.js',
+      //         '**/state/api-response.js',
+      //         '**/state/progress/actions.js',
+      //         '**/style-guide-wrapper.js',
+      //         '**/test-utils.js',
+      //       ],
+      //     },
+      //   }),
       // *** Text-Em-All Web App ***
       !disableESLintPlugin &&
         new ESLintPlugin({
