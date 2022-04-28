@@ -88,43 +88,11 @@ const sassModuleRegex = /\.module\.(scss|sass)$/;
 
 // const shouldDisableWebStatsGeneration = process.env.DISABLE_WEBSTATS === 'true';
 // const shouldEnableDeadFileOutput = process.env.ENABLE_DEADFILE_OUTPUT;
-const entrypointTemplate = path.join(
-  paths.appSrc,
-  'entrypoint-script-template.js'
-);
-
-// Generates an HTML file with the <script> injected for every Text-Em-All Web App entry point.
-const makeHtmlPluginEntryForPage = (
-  entryPoint,
-  templatePath,
-  filename,
-  minifyOptions
-) =>
-  new HtmlWebpackPlugin(
-    Object.assign(
-      {},
-      {
-        inject: true,
-        chunks: [entryPoint],
-        template: templatePath,
-        filename,
-      },
-      minifyOptions
-    )
-  );
 
   // Generates a monolithic javascript file with the contents of all dependant chunks
 //  for every Text-Em-All Web App entry point. These are made available to external
 //  apps to load Text-Em-All Web App bundles - such as forms.
-const makeHtmlPluginEntryForBundle = (entryPoint, filename) =>
-  new HtmlWebpackPlugin({
-    inject: false,
-    chunks: [entryPoint],
-    template: entrypointTemplate,
-    filename: filename,
-    minify: false,
-    cache: false,
-  });
+
 // *** Text-Em-All Text-Em-All Web App
 
 const hasJsxRuntime = (() => {
@@ -147,68 +115,8 @@ module.exports = function(webpackEnv) {
   const isEnvProduction = webpackEnv === 'production';
 
   // *** Text-Em-All Web App ***
-  const envEntryPoints = process.env.ENTRY_POINTS || '';
-  const entryPointsList = envEntryPoints.split(',');
-
-  const conditionalHotDevClient =
-    isEnvDevelopment && require.resolve('react-dev-utils/webpackHotDevClient');
-
-  const teaWebAppEntryPoints = {
-    bundle: [
-      // Include an alternative client for WebpackDevServer. A client's job is to
-      // connect to WebpackDevServer by a socket and get notified about changes.
-      // When you save a file, the client will either apply hot updates (in case
-      // of CSS changes), or refresh the page (in case of JS changes). When you
-      // make a syntax error, this client will display a syntax error overlay.
-      // Note: instead of the default WebpackDevServer client, we use a custom one
-      // to bring better experience for Create React App users. You can replace
-      // the line below with these two lines if you prefer the stock client:
-      // require.resolve('webpack-dev-server/client') + '?/',
-      // require.resolve('webpack/hot/dev-server'),
-      conditionalHotDevClient,
-      // Finally, this is your app's code:
-      // We include the app code last so that if there is a runtime error during
-      // initialization, it doesn't blow up the WebpackDevServer client, and
-      // changing JS code would still trigger a refresh.
-      paths.appIndexJs,
-    ].filter(Boolean),
-  };
-  // Allow excluding entry points from build based on environment variable ENTRY_POINTS.
-  // If the env variable is defined and an entry point is not included, remove it from
-  // the webpack entry points.
-  if (isEnvDevelopment && envEntryPoints) {
-    if (!entryPointsList.includes('bundle')) {
-      delete teaWebAppEntryPoints.bundle;
-    }
-  }
-
-  const minifyOptions = isEnvProduction
-  ? {
-      minify: {
-        removeComments: true,
-        collapseWhitespace: true,
-        removeRedundantAttributes: true,
-        useShortDoctype: true,
-        removeEmptyAttributes: true,
-        removeStyleLinkTypeAttributes: true,
-        keepClosingSlash: true,
-        minifyJS: true,
-        minifyCSS: true,
-        minifyURLs: true,
-      },
-    }
-  : undefined;
-
-  const teaWebAppHtmlPlugins = [
-    makeHtmlPluginEntryForPage(
-      'bundle',
-      paths.appHtml,
-      'index.html',
-      minifyOptions
-    ),
-    makeHtmlPluginEntryForBundle('bundle', 'static/js/bundle.js'),
-  ];
-  // *** Text-Em-All Web App ***
+  // const envEntryPoints = process.env.ENTRY_POINTS || '';
+  // const entryPointsList = envEntryPoints.split(',');
 
   // Variable used for enabling profiling in Production
   // passed into alias object. Uses a flag if passed into the build command
@@ -319,7 +227,7 @@ module.exports = function(webpackEnv) {
       : isEnvDevelopment && 'cheap-module-source-map',
     // These are the "entry points" to our application.
     // This means they will be the "root" imports that are included in JS bundle.
-    entry: teaWebAppEntryPoints, // *** Text-Em-All Web App
+    entry: paths.appIndexJs,
     output: {
       // The build folder.
       path: paths.appBuild,
@@ -413,17 +321,18 @@ module.exports = function(webpackEnv) {
       // Automatically split vendor and commons
       // https://twitter.com/wSokra/status/969633336732905474
       // https://medium.com/webpack/webpack-4-code-splitting-chunk-graph-and-the-splitchunks-optimization-be739a861366
-      splitChunks: {
-        chunks: 'all',
+      // splitChunks: {
+        // chunks: 'all',
+        // adding name breaks the the config due to an API change in Webpack
         // name: isEnvDevelopment,
-      },
+      // },
       // Keep the runtime chunk separated to enable long term caching
       // https://twitter.com/wSokra/status/969679223278505985
       // https://github.com/facebook/create-react-app/issues/5358
       // runtimeChunk: {
       //   name: entrypoint => `runtime-${entrypoint.name}`,
       // },
-      runtimeChunk: 'single', // *** Text-Em-All Web App, was true,
+      // runtimeChunk: 'single', // *** Text-Em-All Web App, was true,
     },
     resolve: {
       // This allows you to set a fallback for where webpack should look for modules.
@@ -731,7 +640,31 @@ module.exports = function(webpackEnv) {
     },
     plugins: [
       // Generates an `index.html` file with the <script> injected.
-      ...teaWebAppHtmlPlugins, // *** Text-Em-All Web App
+      new HtmlWebpackPlugin(
+        Object.assign(
+          {},
+          {
+            inject: true,
+            template: paths.appHtml,
+          },
+          isEnvProduction
+            ? {
+                minify: {
+                  removeComments: true,
+                  collapseWhitespace: true,
+                  removeRedundantAttributes: true,
+                  useShortDoctype: true,
+                  removeEmptyAttributes: true,
+                  removeStyleLinkTypeAttributes: true,
+                  keepClosingSlash: true,
+                  minifyJS: true,
+                  minifyCSS: true,
+                  minifyURLs: true,
+                },
+              }
+            : undefined
+        )
+      ),
       // Inlines the webpack runtime script. This script is too small to warrant
       // a network request.
       // https://github.com/facebook/create-react-app/issues/5358
